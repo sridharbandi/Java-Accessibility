@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 Sridhar Bandi.
+ * Copyright (c) 2020 Sridhar Bandi.
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,6 @@ package io.github.sridharbandi;
 
 import freemarker.template.Template;
 import io.github.sridharbandi.ftl.FtlConfig;
-import io.github.sridharbandi.issues.IErrors;
-import io.github.sridharbandi.issues.INotices;
-import io.github.sridharbandi.issues.IWarnings;
 import io.github.sridharbandi.modal.Issue;
 import io.github.sridharbandi.modal.Issues;
 import io.github.sridharbandi.report.Result;
@@ -42,7 +39,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class AccessibilityRunner extends Result implements IErrors, IWarnings, INotices {
+public class AccessibilityRunner extends Result {
 
     private static Logger LOG = LoggerFactory.getLogger(AccessibilityRunner.class);
 
@@ -95,17 +92,14 @@ public class AccessibilityRunner extends Result implements IErrors, IWarnings, I
         return issues;
     }
 
-    @Override
     public int errorCount() {
         return getCount(processedIssues, 1);
     }
 
-    @Override
     public int noticeCount() {
         return getCount(processedIssues, 3);
     }
 
-    @Override
     public int warningCount() {
         return getCount(processedIssues, 2);
     }
