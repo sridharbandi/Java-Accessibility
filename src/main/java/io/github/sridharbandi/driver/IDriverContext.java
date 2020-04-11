@@ -30,6 +30,7 @@ public interface IDriverContext {
     long viewPortWidth();
     long viewPortHeight();
     List<Map<String, String>> executeScript();
+    Map<String, Object> executeAxe();
     String viewPort();
     String url();
     String device();

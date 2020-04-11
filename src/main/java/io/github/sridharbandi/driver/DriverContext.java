@@ -62,10 +62,19 @@ public class DriverContext implements IDriverContext {
         waitForLoad();
         javascriptExecutor.executeScript(Statik.HTMLCS_SCRIPT);
         waitForLoad();
-        javascriptExecutor.executeScript(String.format(Statik.RUNNER, Accessibility.STANDARD.name()));
+        javascriptExecutor.executeScript(String.format(Statik.HTMLCS_RUNNER, Accessibility.STANDARD.name()));
         waitForLoad();
         List<Map<String, String>> issuesList = (ArrayList<Map<String, String>>) javascriptExecutor.executeScript(Statik.HTMLCS_RESULTS);
         return issuesList;
+    }
+
+    @Override
+    public Map<String, Object> executeAxe() {
+        waitForLoad();
+        javascriptExecutor.executeScript(Statik.AXE_SCRIPT);
+        waitForLoad();
+        Map<String, Object> response = (Map<String, Object>) javascriptExecutor.executeAsyncScript(String.format(Statik.AXE_RUNNER, "{ rules: { 'accesskeys': { enabled: false } } }"));
+        return response;
     }
 
     private void waitForLoad() {
