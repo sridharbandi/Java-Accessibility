@@ -21,14 +21,13 @@
  */
 package io.github.sridharbandi.report;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.sridharbandi.modal.Issue;
+import io.github.sridharbandi.modal.axe.AxeIssue;
 import org.openqa.selenium.WebDriver;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,6 +46,21 @@ public class Result extends Report {
             Issue issue = objectMapper.convertValue(entry, Issue.class);
             issue.setIssueTechniques(getIssueTechniques(issue.getIssueCode()));
             return issue;
+        }).collect(Collectors.toList());
+    }
+
+    protected Map<String, List<AxeIssue>> axeIssueList(Map<String, Object> issueList) {
+        Map<String, List<AxeIssue>> axeIssues = new HashMap<>();
+        axeIssues.put("violations", filterIssues(issueList, "violations"));
+        axeIssues.put("incomplete", filterIssues(issueList, "incomplete"));
+        return axeIssues;
+    }
+
+    protected List<AxeIssue> filterIssues(Map<String, Object> issueList, String type) {
+        List<Map<String, Object>> issueType = (List<Map<String, Object>>) issueList.get(type);
+        return issueType.stream().map(entry -> {
+            ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            return objectMapper.convertValue(entry, AxeIssue.class);
         }).collect(Collectors.toList());
     }
 
