@@ -1,12 +1,13 @@
 package io.github.sridharbandi.modal.axe;
 
+import java.util.List;
 import java.util.Map;
 
 public class AxeIssues {
-    private String critical;
-    private String serious;
-    private String moderate;
-    private String minor;
+    private int critical;
+    private int serious;
+    private int moderate;
+    private int minor;
     private String name;
     private String standard;
     private String url;
@@ -15,37 +16,37 @@ public class AxeIssues {
     private String device;
     private String browser;
     private String reportID;
-    private Map<String, AxeIssue> issues;
+    private Map<String, List<AxeIssue>> issues;
 
-    public String getCritical() {
+    public int getCritical() {
         return critical;
     }
 
-    public void setCritical(String critical) {
+    public void setCritical(int critical) {
         this.critical = critical;
     }
 
-    public String getSerious() {
+    public int getSerious() {
         return serious;
     }
 
-    public void setSerious(String serious) {
+    public void setSerious(int serious) {
         this.serious = serious;
     }
 
-    public String getModerate() {
+    public int getModerate() {
         return moderate;
     }
 
-    public void setModerate(String moderate) {
+    public void setModerate(int moderate) {
         this.moderate = moderate;
     }
 
-    public String getMinor() {
+    public int getMinor() {
         return minor;
     }
 
-    public void setMinor(String minor) {
+    public void setMinor(int minor) {
         this.minor = minor;
     }
 
@@ -113,11 +114,11 @@ public class AxeIssues {
         this.reportID = reportID;
     }
 
-    public Map<String, AxeIssue> getIssues() {
+    public Map<String, List<AxeIssue>> getIssues() {
         return issues;
     }
 
-    public void setIssues(Map<String, AxeIssue> issues) {
+    public void setIssues(Map<String, List<AxeIssue>> issues) {
         this.issues = issues;
     }
 }
