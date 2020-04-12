@@ -28,6 +28,7 @@ import io.github.sridharbandi.modal.axe.AxeIssues;
 import io.github.sridharbandi.modal.axe.AxeNode;
 import io.github.sridharbandi.report.Result;
 import io.github.sridharbandi.util.DateUtil;
+import io.github.sridharbandi.util.SaveJson;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ public class AXERunner extends Result {
         issueList = executeAxe();
         processedIssues = axeIssueList(issueList);
         issues = getIssues(pageName);
+        SaveJson.save(issues, pageName);
         System.out.println("Hello");
     }
 
