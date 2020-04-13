@@ -21,11 +21,11 @@
  */
 package io.github.sridharbandi;
 
-import io.github.sridharbandi.modal.Issue;
+import freemarker.template.Template;
+import io.github.sridharbandi.ftl.FtlConfig;
 import io.github.sridharbandi.modal.Issues;
 import io.github.sridharbandi.modal.axe.AxeIssue;
 import io.github.sridharbandi.modal.axe.AxeIssues;
-import io.github.sridharbandi.modal.axe.AxeNode;
 import io.github.sridharbandi.report.Result;
 import io.github.sridharbandi.util.DateUtil;
 import io.github.sridharbandi.util.SaveJson;
@@ -33,12 +33,10 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class AXERunner extends Result {
 
@@ -60,8 +58,7 @@ public class AXERunner extends Result {
         issueList = executeAxe();
         processedIssues = axeIssueList(issueList);
         issues = getIssues(pageName);
-        SaveJson.save(issues, pageName);
-        System.out.println("Hello");
+        SaveJson.save(issues, pageName, "axe");
     }
 
     private AxeIssues getIssues(String reportName) {
@@ -91,6 +88,26 @@ public class AXERunner extends Result {
                 .map(AxeIssue::getNodes)
                 .mapToInt(List::size)
                 .sum();
+    }
+
+    public void generateHtmlReport() {
+        List<AxeIssues> allissues = jsonAxeIssues();
+
+        Template tmplIndex = FtlConfig.getInstance().getTemplate("axe-index.ftl");
+        Map<String, Object> map = new HashMap<>();
+        map.put("reportname", "Accessibility Report");
+        map.put("urlcount", reportAxeUrls(allissues).size());
+        map.put("criticalcount", count(reportCritical(allissues)));
+        map.put("seriouscount", count(reportSerious(allissues)));
+        map.put("moderatecount", count(reportModerate(allissues)));
+        map.put("minorcount", count(reportMinor(allissues)));
+        map.put("urls", reportAxeUrls(allissues));
+        map.put("critical", reportCritical(allissues));
+        map.put("serious", reportSerious(allissues));
+        map.put("moderate", reportModerate(allissues));
+        map.put("minor", reportMinor(allissues));
+        map.put("issues", allissues);
+        save(tmplIndex, map, "index", "axe");
     }
 
 }
