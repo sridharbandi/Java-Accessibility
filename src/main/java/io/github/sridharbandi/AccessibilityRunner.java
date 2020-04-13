@@ -60,7 +60,7 @@ public class AccessibilityRunner extends Result {
         issueList = executeScript();
         processedIssues = issueList(issueList);
         issues = getIssues(pageName);
-        SaveJson.save(issues, pageName);
+        SaveJson.save(issues, pageName, "htmlcs");
     }
 
     public void setStandard(Standard standard) {
@@ -106,7 +106,7 @@ public class AccessibilityRunner extends Result {
 
     public void generateHtmlReport() {
         Template tmplPage = FtlConfig.getInstance().getTemplate("page.ftl");
-        List<Issues> allissues = jsonIssues();
+        List<Issues> allissues = jsonHtmlcsIssues();
         for (Issues issues : allissues) {
             Map<String, Object> map = new HashMap<>();
             map.put("reportname", issues.getName());
@@ -125,7 +125,7 @@ public class AccessibilityRunner extends Result {
             map.put("warnings", warnings);
             List<Issue> notices = issues.getIssues().stream().filter(issue -> issue.getIssueType() == 3).collect(Collectors.toList());
             map.put("notices", notices);
-            save(tmplPage, map, issues.getReportID());
+            save(tmplPage, map, issues.getReportID(), "htmlcs");
         }
 
         Template tmplIndex = FtlConfig.getInstance().getTemplate("index.ftl");
@@ -140,7 +140,7 @@ public class AccessibilityRunner extends Result {
         map.put("warnings", reportWarnings(allissues));
         map.put("notices", reportNotices(allissues));
         map.put("issues", allissues);
-        save(tmplIndex, map, "index");
+        save(tmplIndex, map, "index","htmlcs");
     }
 
 
