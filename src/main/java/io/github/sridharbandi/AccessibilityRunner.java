@@ -39,6 +39,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Accessibility Runner Class
+ *
+ * @deprecated This class is no longer valid and is replaced by {@link HTMLCSRunner}
+ */
+@Deprecated
 public class AccessibilityRunner extends Result {
 
     private static Logger LOG = LoggerFactory.getLogger(AccessibilityRunner.class);
@@ -51,10 +57,19 @@ public class AccessibilityRunner extends Result {
         super(driver);
     }
 
+    /**
+     * @deprecated This method is deprecated
+     * Use {@link HTMLCSRunner#execute()} instead
+     */
+    @Deprecated
     public void execute() {
         execute(pageTitle());
     }
 
+    /**
+     * @deprecated This method is deprecated
+     * Use {@link HTMLCSRunner#execute(String)} instead
+     */
     public void execute(String pageName) {
         LOG.info("Running Accessibility for {} page", pageName);
         issueList = executeScript();
@@ -63,14 +78,26 @@ public class AccessibilityRunner extends Result {
         SaveJson.save(issues, pageName, "htmlcs");
     }
 
+    /**
+     * @deprecated This method is deprecated
+     * Use {@link HTMLCSRunner#setStandard(Standard)} instead
+     */
     public void setStandard(Standard standard) {
         Accessibility.STANDARD = standard;
     }
 
+    /**
+     * @deprecated This method is deprecated
+     * Use {@link HTMLCSRunner#getIssueList()} instead
+     */
     public List<Issue> getIssueList() {
         return processedIssues;
     }
 
+    /**
+     * @deprecated This method is deprecated
+     * Use {@link HTMLCSRunner#getIssues()} instead
+     */
     public Issues getIssues() {
         return issues;
     }
@@ -92,18 +119,34 @@ public class AccessibilityRunner extends Result {
         return issues;
     }
 
+    /**
+     * @deprecated This method is deprecated
+     * Use {@link HTMLCSRunner#errorCount()} instead
+     */
     public int errorCount() {
         return getCount(processedIssues, 1);
     }
 
+    /**
+     * @deprecated This method is deprecated
+     * Use {@link HTMLCSRunner#noticeCount()} instead
+     */
     public int noticeCount() {
         return getCount(processedIssues, 3);
     }
 
+    /**
+     * @deprecated This method is deprecated
+     * Use {@link HTMLCSRunner#warningCount()} instead
+     */
     public int warningCount() {
         return getCount(processedIssues, 2);
     }
 
+    /**
+     * @deprecated This method is deprecated
+     * Use {@link HTMLCSRunner#generateHtmlReport()} instead
+     */
     public void generateHtmlReport() {
         Template tmplPage = FtlConfig.getInstance().getTemplate("page.ftl");
         List<Issues> allissues = jsonHtmlcsIssues();
@@ -140,7 +183,7 @@ public class AccessibilityRunner extends Result {
         map.put("warnings", reportWarnings(allissues));
         map.put("notices", reportNotices(allissues));
         map.put("issues", allissues);
-        save(tmplIndex, map, "index","htmlcs");
+        save(tmplIndex, map, "index", "htmlcs");
     }
 
 
