@@ -22,6 +22,14 @@
 package io.github.sridharbandi.util;
 
 public enum Runner {
-    AXE,
-    HTMLCS
+    AXE {
+        public String toString() {
+            return "axe";
+        }
+    },
+    HTMLCS {
+        public String toString() {
+            return "htmlcs";
+        }
+    }
 }
