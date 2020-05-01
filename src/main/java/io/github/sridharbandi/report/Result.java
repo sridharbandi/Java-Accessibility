@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.sridharbandi.modal.Issue;
 import io.github.sridharbandi.modal.axe.AxeIssue;
+import io.github.sridharbandi.modal.axe.AxeIssueList;
 import org.openqa.selenium.WebDriver;
 
 import java.util.*;
@@ -49,19 +50,41 @@ public class Result extends Report {
         }).collect(Collectors.toList());
     }
 
-    protected Map<String, List<AxeIssue>> axeIssueList(Map<String, Object> issueList) {
-        Map<String, List<AxeIssue>> axeIssues = new HashMap<>();
+    protected Map<String, AxeIssueList> axeIssueList(Map<String, Object> issueList) {
+        Map<String, AxeIssueList> axeIssues = new HashMap<>();
         axeIssues.put("violations", filterIssues(issueList, "violations"));
         axeIssues.put("incomplete", filterIssues(issueList, "incomplete"));
         return axeIssues;
     }
 
-    protected List<AxeIssue> filterIssues(Map<String, Object> issueList, String type) {
+    protected AxeIssueList filterIssues(Map<String, Object> issueList, String type) {
         List<Map<String, Object>> issueType = (List<Map<String, Object>>) issueList.get(type);
-        return issueType.stream().map(entry -> {
+        List<AxeIssue> axeIssues = issueType.stream().map(entry -> {
             ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper.convertValue(entry, AxeIssue.class);
         }).collect(Collectors.toList());
+        AxeIssueList axeIssueList = new AxeIssueList();
+        Map<String, Integer> stats = new LinkedHashMap<>();
+        int critical = issueCount(axeIssues, "critical");
+        int serious = issueCount(axeIssues, "serious");
+        int moderate = issueCount(axeIssues, "moderate");
+        int minor = issueCount(axeIssues, "minor");
+        stats.put("critical", critical);
+        stats.put("serious", serious);
+        stats.put("moderate", moderate);
+        stats.put("minor", minor);
+        axeIssueList.setStats(stats);
+        axeIssueList.setTotal(critical + serious + moderate + minor);
+        axeIssueList.setIssueList(axeIssues);
+        return axeIssueList;
+    }
+
+    private int issueCount(List<AxeIssue> axeIssues, String impact) {
+        return axeIssues.stream().filter(axeIssue -> axeIssue.getImpact().equalsIgnoreCase(impact))
+                .map(AxeIssue::getNodes)
+                .mapToInt(List::size)
+                .sum();
+
     }
 
     protected List<String> getIssueTechniques(String issueCode) {
