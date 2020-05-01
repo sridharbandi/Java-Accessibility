@@ -38,11 +38,11 @@ public class SaveJson {
 
     private static Logger LOG = LoggerFactory.getLogger(SaveJson.class);
 
-    public static void save(Issues issues, String reportName) {
+    public static void save(Object issues, String reportName, String engine) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String strResponse = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(issues);
-            String path = getReportPath(true) + "/" + reportName + ".json";
+            String path = getReportPath(true, engine) + "/" + reportName + ".json";
             Files.write(Paths.get(path), strResponse.getBytes(StandardCharsets.UTF_8));
             LOG.info("Saved Accessibility Json Report {} at {}", reportName, path);
             if (Accessibility.LOG_RESULTS) {
@@ -57,9 +57,9 @@ public class SaveJson {
         }
     }
 
-    public static String getReportPath(boolean isJson) {
+    public static String getReportPath(boolean isJson, String engine) {
         String folder = isJson ? "json" : "html";
-        String directory = Accessibility.REPORT_PATH + "/report/" + folder;
+        String directory = Accessibility.REPORT_PATH + "/report/" + engine + "/" + folder;
         Path path = Paths.get(directory);
         try {
             if (!Files.exists(path)) {
