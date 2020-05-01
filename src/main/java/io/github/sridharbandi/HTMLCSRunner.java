@@ -39,6 +39,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static io.github.sridharbandi.util.Data.*;
+import static io.github.sridharbandi.util.Data.NOTICE;
+import static io.github.sridharbandi.util.Runner.*;
+
 public class HTMLCSRunner extends Result {
 
     private static Logger LOG = LoggerFactory.getLogger(HTMLCSRunner.class);
@@ -106,7 +110,7 @@ public class HTMLCSRunner extends Result {
 
     public void generateHtmlReport() {
         Template tmplPage = FtlConfig.getInstance().getTemplate("page.ftl");
-        List<Issues> allissues = jsonHtmlcsIssues();
+        List<Issues> allissues = (List<Issues>) jsonIssues(HTMLCS, Issues.class);
         for (Issues issues : allissues) {
             Map<String, Object> map = new HashMap<>();
             map.put("reportname", issues.getName());
@@ -125,22 +129,22 @@ public class HTMLCSRunner extends Result {
             map.put("warnings", warnings);
             List<Issue> notices = issues.getIssues().stream().filter(issue -> issue.getIssueType() == 3).collect(Collectors.toList());
             map.put("notices", notices);
-            save(tmplPage, map, issues.getReportID(), "htmlcs");
+            save(tmplPage, map, issues.getReportID(), HTMLCS);
         }
 
         Template tmplIndex = FtlConfig.getInstance().getTemplate("index.ftl");
         Map<String, Object> map = new HashMap<>();
         map.put("reportname", "Accessibility Report");
-        map.put("urlcount", reportUrls(allissues).size());
-        map.put("errorscount", count(reportErrors(allissues)));
-        map.put("warningscount", count(reportWarnings(allissues)));
-        map.put("noticescount", count(reportNotices(allissues)));
-        map.put("urls", reportUrls(allissues));
-        map.put("errors", reportErrors(allissues));
-        map.put("warnings", reportWarnings(allissues));
-        map.put("notices", reportNotices(allissues));
+        map.put("urlcount", reportHtmlcsData(allissues, URL).size());
+        map.put("errorscount", count((List<Integer>) reportHtmlcsData(allissues, ERROR)));
+        map.put("warningscount", count((List<Integer>) reportHtmlcsData(allissues, WARNING)));
+        map.put("noticescount", count((List<Integer>) reportHtmlcsData(allissues, NOTICE)));
+        map.put("urls", reportHtmlcsData(allissues, URL));
+        map.put("errors", reportHtmlcsData(allissues, ERROR));
+        map.put("warnings", reportHtmlcsData(allissues, WARNING));
+        map.put("notices", reportHtmlcsData(allissues, NOTICE));
         map.put("issues", allissues);
-        save(tmplIndex, map, "index","htmlcs");
+        save(tmplIndex, map, "index", HTMLCS);
     }
 
 

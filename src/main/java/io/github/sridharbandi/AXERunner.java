@@ -21,29 +21,33 @@
  */
 package io.github.sridharbandi;
 
+import com.google.common.io.Files;
 import freemarker.template.Template;
 import io.github.sridharbandi.ftl.FtlConfig;
-import io.github.sridharbandi.modal.Issues;
 import io.github.sridharbandi.modal.axe.AxeIssue;
+import io.github.sridharbandi.modal.axe.AxeIssueList;
 import io.github.sridharbandi.modal.axe.AxeIssues;
 import io.github.sridharbandi.report.Result;
-import io.github.sridharbandi.util.DateUtil;
-import io.github.sridharbandi.util.SaveJson;
+import io.github.sridharbandi.util.*;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static io.github.sridharbandi.util.Data.*;
+import static io.github.sridharbandi.util.Runner.*;
 
 public class AXERunner extends Result {
 
     private static Logger LOG = LoggerFactory.getLogger(AXERunner.class);
     private Map<String, Object> issueList;
-    private Map<String, List<AxeIssue>> processedIssues;
+    private Map<String, AxeIssueList> processedIssues;
     private AxeIssues issues;
+    private String standard;
 
     public AXERunner(WebDriver driver) {
         super(driver);
@@ -57,8 +61,19 @@ public class AXERunner extends Result {
         LOG.info("Running Accessibility for {} page", pageName);
         issueList = executeAxe();
         processedIssues = axeIssueList(issueList);
+        standard = getStandards(issueList);
         issues = getIssues(pageName);
         SaveJson.save(issues, pageName, "axe");
+    }
+
+    private String getStandards(Map<String, Object> issueList) {
+        Map<String, Object> toolOptions = (Map<String, Object>) issueList.get("toolOptions");
+        if (toolOptions.containsKey("runOnly")) {
+            Map<String, Object> runOnly = (Map<String, Object>) toolOptions.get("runOnly");
+            List<String> tags = (ArrayList<String>) runOnly.get("values");
+            return String.join(",", tags);
+        }
+        return "wcag2a,wcag2aa,section508,best-practice";
     }
 
     private AxeIssues getIssues(String reportName) {
@@ -67,8 +82,8 @@ public class AXERunner extends Result {
         issues.setSerious(issueCount("serious"));
         issues.setModerate(issueCount("moderate"));
         issues.setMinor(issueCount("minor"));
-        //Todo Change the Accessibility Standar Logic
-        issues.setStandard(Accessibility.STANDARD.name());
+        issues.setStandard(standard);
+        issues.setEngine("AXE");
         issues.setUrl(url());
         issues.setDate(DateUtil.getDate());
         issues.setSize(viewPort());
@@ -83,6 +98,7 @@ public class AXERunner extends Result {
     private int issueCount(String impact) {
         return processedIssues.values()
                 .stream()
+                .map(AxeIssueList::getIssueList)
                 .flatMap(List::stream)
                 .filter(axeIssue -> axeIssue.getImpact().equalsIgnoreCase(impact))
                 .map(AxeIssue::getNodes)
@@ -91,23 +107,41 @@ public class AXERunner extends Result {
     }
 
     public void generateHtmlReport() {
-        List<AxeIssues> allissues = jsonAxeIssues();
-
+        Template tmplPage = FtlConfig.getInstance().getTemplate("axe-page.ftl");
+        List<AxeIssues> allissues = (List<AxeIssues>) jsonIssues(AXE, AxeIssues.class);
+        for (AxeIssues issues : allissues) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("reportname", issues.getName());
+            map.put("url", issues.getUrl());
+            map.put("standard", issues.getStandard());
+            map.put("browser", issues.getBrowser());
+            map.put("browsersize", issues.getSize());
+            map.put("device", issues.getDevice());
+            map.put("datetime", issues.getDate());
+            map.put("engine", "Axe");
+            map.put("version", Statik.AXE_VERSION);
+            map.put("criticalcount", issues.getCritical());
+            map.put("seriouscount", issues.getSerious());
+            map.put("moderatecount", issues.getModerate());
+            map.put("minorcount", issues.getMinor());
+            map.put("results", issues.getIssues());
+            save(tmplPage, map, issues.getReportID(), AXE);
+        }
         Template tmplIndex = FtlConfig.getInstance().getTemplate("axe-index.ftl");
         Map<String, Object> map = new HashMap<>();
         map.put("reportname", "Accessibility Report");
-        map.put("urlcount", reportAxeUrls(allissues).size());
-        map.put("criticalcount", count(reportCritical(allissues)));
-        map.put("seriouscount", count(reportSerious(allissues)));
-        map.put("moderatecount", count(reportModerate(allissues)));
-        map.put("minorcount", count(reportMinor(allissues)));
-        map.put("urls", reportAxeUrls(allissues));
-        map.put("critical", reportCritical(allissues));
-        map.put("serious", reportSerious(allissues));
-        map.put("moderate", reportModerate(allissues));
-        map.put("minor", reportMinor(allissues));
+        map.put("urlcount", reportAxeData(allissues, URL).size());
+        map.put("criticalcount", count((List<Integer>) reportAxeData(allissues,CRITICAL)));
+        map.put("seriouscount", count((List<Integer>) reportAxeData(allissues,SERIOUS)));
+        map.put("moderatecount", count((List<Integer>) reportAxeData(allissues,MODERATE)));
+        map.put("minorcount", count((List<Integer>) reportAxeData(allissues,MINOR)));
+        map.put("urls", reportAxeData(allissues, URL));
+        map.put("critical", reportAxeData(allissues,CRITICAL));
+        map.put("serious", reportAxeData(allissues,SERIOUS));
+        map.put("moderate", reportAxeData(allissues,MODERATE));
+        map.put("minor", reportAxeData(allissues,MINOR));
         map.put("issues", allissues);
-        save(tmplIndex, map, "index", "axe");
+        save(tmplIndex, map, "index", AXE);
     }
 
 }
