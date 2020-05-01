@@ -28,6 +28,8 @@ import io.github.sridharbandi.Accessibility;
 import io.github.sridharbandi.driver.DriverContext;
 import io.github.sridharbandi.modal.Issues;
 import io.github.sridharbandi.modal.axe.AxeIssues;
+import io.github.sridharbandi.util.Data;
+import io.github.sridharbandi.util.Runner;
 import io.github.sridharbandi.util.SaveJson;
 
 import java.io.File;
@@ -54,23 +56,22 @@ public class Report extends DriverContext {
         super(driver);
     }
 
-    protected List<Issues> jsonHtmlcsIssues() {
-        List<Issues> allissues = null;
+    protected List<?> jsonIssues(Runner runner, Class<?> clazz) {
+        List<?> allissues = null;
         try {
-            allissues = Files.walk(Paths.get(Accessibility.REPORT_PATH + "/report/htmlcs/json"))
+            allissues = Files.walk(Paths.get(Accessibility.REPORT_PATH + "/report/" + runner.toString() + "/json"))
                     .filter(Files::isRegularFile)
                     .map(Path::toFile)
                     .filter(file -> FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("json"))
                     .map(file -> {
                         ObjectMapper mapper = new ObjectMapper();
-                        Issues issues = null;
                         try {
-                            issues = mapper.readValue(file, Issues.class);
+                            return mapper.readValue(file, clazz);
                         } catch (IOException e) {
                             e.printStackTrace();
                             LOG.error("Failed to read json file {}", file.getAbsolutePath());
                         }
-                        return issues;
+                        return null;
                     })
                     .collect(Collectors.toList());
         } catch (IOException e) {
@@ -78,80 +79,55 @@ public class Report extends DriverContext {
             LOG.error("Failed to get json files from path {}", Accessibility.REPORT_PATH);
         }
         return allissues;
+
     }
 
-    protected List<AxeIssues> jsonAxeIssues() {
-        List<AxeIssues> allissues = null;
-        try {
-            allissues = Files.walk(Paths.get(Accessibility.REPORT_PATH + "/report/axe/json"))
-                    .filter(Files::isRegularFile)
-                    .map(Path::toFile)
-                    .filter(file -> FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("json"))
-                    .map(file -> {
-                        ObjectMapper mapper = new ObjectMapper();
-                        AxeIssues issues = null;
-                        try {
-                            issues = mapper.readValue(file, AxeIssues.class);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            LOG.error("Failed to read json file {}", file.getAbsolutePath());
-                        }
-                        return issues;
-                    })
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-            LOG.error("Failed to get json files from path {}", Accessibility.REPORT_PATH);
-        }
-        return allissues;
+    protected List<?> reportHtmlcsData(List<Issues> issues, Data data) {
+        return issues.stream().map(issue -> {
+            switch (data) {
+                case URL:
+                    return issue.getUrl();
+                case ERROR:
+                    return issue.getErrors();
+                case WARNING:
+                    return issue.getWarnings();
+                case NOTICE:
+                    return issue.getNotices();
+                default:
+                    return null;
+            }
+        }).collect(Collectors.toList());
     }
 
-    protected List<String> reportUrls(List<Issues> allissues) {
-        return allissues.stream().map(Issues::getUrl).collect(Collectors.toList());
-    }
-
-    protected List<String> reportAxeUrls(List<AxeIssues> allissues) {
-        return allissues.stream().map(AxeIssues::getUrl).collect(Collectors.toList());
-    }
-
-    protected List<Integer> reportErrors(List<Issues> allissues) {
-        return allissues.stream().map(Issues::getErrors).collect(Collectors.toList());
-    }
-
-    protected List<Integer> reportCritical(List<AxeIssues> allissues) {
-        return allissues.stream().map(AxeIssues::getCritical).collect(Collectors.toList());
-    }
-
-    protected List<Integer> reportSerious(List<AxeIssues> allissues) {
-        return allissues.stream().map(AxeIssues::getSerious).collect(Collectors.toList());
-    }
-
-    protected List<Integer> reportModerate(List<AxeIssues> allissues) {
-        return allissues.stream().map(AxeIssues::getModerate).collect(Collectors.toList());
-    }
-
-    protected List<Integer> reportMinor(List<AxeIssues> allissues) {
-        return allissues.stream().map(AxeIssues::getMinor).collect(Collectors.toList());
-    }
-
-    protected List<Integer> reportWarnings(List<Issues> allissues) {
-        return allissues.stream().map(Issues::getWarnings).collect(Collectors.toList());
-    }
-
-    protected List<Integer> reportNotices(List<Issues> allissues) {
-        return allissues.stream().map(Issues::getNotices).collect(Collectors.toList());
+    protected List<?> reportAxeData(List<AxeIssues> issues, Data data) {
+        return issues.stream().map(issue -> {
+            switch (data) {
+                case URL:
+                    return issue.getUrl();
+                case CRITICAL:
+                    return issue.getCritical();
+                case SERIOUS:
+                    return issue.getSerious();
+                case MODERATE:
+                    return issue.getModerate();
+                case MINOR:
+                    return issue.getMinor();
+                default:
+                    return null;
+            }
+        }).collect(Collectors.toList());
     }
 
     protected int count(List<Integer> list) {
         return list.stream().mapToInt(Integer::intValue).sum();
     }
 
-    protected void save(Template tmpl, Map<String, Object> map, String name, String engine) {
+    protected void save(Template tmpl, Map<String, Object> map, String name, Runner engine) {
         Path path = null;
         File report = null;
         try {
-            path = Paths.get(SaveJson.getReportPath(false, engine));
-            report = new File(path + "/" + name + ".html");
+            path = Paths.get(SaveJson.getReportPath(false, engine.toString()));
+            report = new File(path + File.separator + name + ".html");
             Writer file = new FileWriter(report);
             if (tmpl == null) {
                 throw new IOException("No Template");
@@ -162,7 +138,7 @@ public class Report extends DriverContext {
             String loggerMsg = name.equalsIgnoreCase("index") ? "Consoliated " : "Page ";
             LOG.info(loggerMsg + "report generated at " + report.getAbsolutePath());
         } catch (IOException e) {
-            LOG.error("unable to write file: " + path + "/" + name);
+            LOG.error("unable to write file: " + path + File.separator + name);
             e.printStackTrace();
         } catch (TemplateException e) {
             LOG.error("unable to find template: " + tmpl + " for " + name);
