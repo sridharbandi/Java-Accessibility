@@ -22,13 +22,20 @@
 package io.github.sridharbandi.util;
 
 public class Statik {
-    //HTMLCS Script
-    public final static String HTMLCS_SCRIPT = "var script = document.createElement('script');\n" +
+    //HTMLCS Source
+    public static String HTMLCS_SOURCE = "https://squizlabs.github.io/HTML_CodeSniffer/build/HTMLCS.js";
+    //AXE Version
+    public static String AXE_VERSION = "3.5.3";
+    //AXE Source
+    public static String AXE_SOURCE = "https://cdnjs.cloudflare.com/ajax/libs/axe-core/" + AXE_VERSION + "/axe.min.js";
+
+    //Inject Script
+    public final static String RUNNER_SCRIPT = "var script = document.createElement('script');\n" +
             "script.type = 'text/javascript';\n" +
-            "script.src = 'https://squizlabs.github.io/HTML_CodeSniffer/build/HTMLCS.js';\n" +
+            "script.src = '%s';\n" +
             "document.head.appendChild(script);";
     //HTMLCS Runner
-    public static String RUNNER = "window.HTMLCS_RUNNER.run('%s');";
+    public static String HTMLCS_RUNNER = "window.HTMLCS_RUNNER.run('%s');";
     //HTMLCS Results
     public static String HTMLCS_RESULTS = "return window.HTMLCS.getMessages().map(processIssue);\n" +
             "function processIssue(issue) {\n" +
@@ -48,6 +55,9 @@ public class Statik {
             "}\n" +
             "return a;\n" +
             "}";
+    //AXE Runner
+    public static String AXE_RUNNER = "var callback = arguments[arguments.length - 1];" +
+            "axe.run(document, %s).then(results => callback(results));";
     //Freemarker Templates
     public static final String TEMPLATE_DIR = "ftl";
     //Report Encoding
