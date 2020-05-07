@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
 public class FtlConfig {
     private static Logger LOG = LoggerFactory.getLogger(FtlConfig.class);
 
-    private static FtlConfig instance = null;
+    private static FtlConfig instance;
 
-    private Configuration cfg = null;
+    private Configuration cfg;
 
     public FtlConfig() {
         cfg = new Configuration(Configuration.VERSION_2_3_29);
