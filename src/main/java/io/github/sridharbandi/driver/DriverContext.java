@@ -60,7 +60,7 @@ public class DriverContext implements IDriverContext {
     @Override
     public List<Map<String, String>> executeScript() {
         waitForLoad();
-        javascriptExecutor.executeScript(Statik.HTMLCS_SCRIPT);
+        javascriptExecutor.executeScript(String.format(Statik.RUNNER_SCRIPT, Statik.HTMLCS_SOURCE));
         waitForLoad();
         javascriptExecutor.executeScript(String.format(Statik.HTMLCS_RUNNER, Accessibility.STANDARD.name()));
         waitForLoad();
@@ -71,9 +71,9 @@ public class DriverContext implements IDriverContext {
     @Override
     public Map<String, Object> executeAxe() {
         waitForLoad();
-        javascriptExecutor.executeScript(Statik.AXE_SCRIPT);
+        javascriptExecutor.executeScript(String.format(Statik.RUNNER_SCRIPT, Statik.AXE_SOURCE));
         waitForLoad();
-        Map<String, Object> response = (Map<String, Object>) javascriptExecutor.executeAsyncScript(String.format(Statik.AXE_RUNNER, "{ rules: { 'accesskeys': { enabled: false } } }"));
+        Map<String, Object> response = (Map<String, Object>) javascriptExecutor.executeAsyncScript(String.format(Statik.AXE_RUNNER, "{ runOnly: { type: 'tag', values: ['wcag2a','wcag2aa','section508'] },rules: { 'accesskeys': { enabled: false } } }"));
         return response;
     }
 
