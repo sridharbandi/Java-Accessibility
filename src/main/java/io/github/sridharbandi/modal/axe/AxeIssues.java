@@ -1,6 +1,5 @@
 package io.github.sridharbandi.modal.axe;
 
-import java.util.List;
 import java.util.Map;
 
 public class AxeIssues {
@@ -9,6 +8,7 @@ public class AxeIssues {
     private int moderate;
     private int minor;
     private String name;
+    private String engine;
     private String standard;
     private String url;
     private String date;
@@ -16,7 +16,7 @@ public class AxeIssues {
     private String device;
     private String browser;
     private String reportID;
-    private Map<String, List<AxeIssue>> issues;
+    private Map<String, AxeIssueList> issues;
 
     public int getCritical() {
         return critical;
@@ -56,6 +56,14 @@ public class AxeIssues {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEngine() {
+        return engine;
+    }
+
+    public void setEngine(String engine) {
+        this.engine = engine;
     }
 
     public String getStandard() {
@@ -114,11 +122,11 @@ public class AxeIssues {
         this.reportID = reportID;
     }
 
-    public Map<String, List<AxeIssue>> getIssues() {
+    public Map<String, AxeIssueList> getIssues() {
         return issues;
     }
 
-    public void setIssues(Map<String, List<AxeIssue>> issues) {
+    public void setIssues(Map<String, AxeIssueList> issues) {
         this.issues = issues;
     }
 }
