@@ -1,11 +1,23 @@
 <div class="row">
     <div class="col-lg-6 col-md-6">
+        <h6 class="text-info"><i class="fas fa-universal-access text-warning"></i><span
+                    class="text-warning"> Engine</span> : ${engine}</h6>
+        <hr/>
+    </div>
+    <div class="col-lg-6 col-md-6">
+        <h6 class="text-info"><i class="fas fa-code-branch text-warning"></i><span
+                    class="text-warning"> ${engine} version</span> : ${version}</h6>
+        <hr/>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6 col-md-6">
         <h6 class="text-info text-truncate"><i class="fas fa-external-link-alt text-warning"></i><span
                     class="text-warning"> Url</span> : ${url}</h6>
         <hr/>
     </div>
     <div class="col-lg-6 col-md-6">
-        <h6 class="text-info"><i class="fas fa-list-ul text-warning"></i><span class="text-warning"> Standard</span>
+        <h6 class="text-info"><i class="fas fa-list-ul text-warning"></i><span class="text-warning"> Standard(s)</span>
             : ${standard}</h6>
         <hr/>
     </div>
@@ -32,7 +44,7 @@
     </div>
     <div class="col-lg-6 col-md-6">
         <h6 class="text-info"><i class="fas fa-clock text-warning"></i><span
-                    class="text-warning"> Timestamp</span>:${datetime}</h6>
+                    class="text-warning"> Timestamp</span> : ${datetime}</h6>
         <hr/>
     </div>
 </div>
