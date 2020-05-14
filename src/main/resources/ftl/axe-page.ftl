@@ -170,12 +170,16 @@
                                                             class="alert-link">${issues[issuekey]}</a></div>
                                                 <hr/>
                                             <#else>
-                                                <div><strong>${issuekey?cap_first} : </strong>${issues[issuekey]}</div>
+                                                <div><strong>${issuekey?cap_first} : </strong>${issues[issuekey]}
+                                                </div>
                                                 <hr/>
                                             </#if>
                                         </#list>
                                     </div>
                                 </div>
+                            <#else>
+                                <p class="h3 text-center text-${colorMap['${issueType}']}">No ${issueType} issues
+                                    found</p>
                             </#list>
                         </div>
                     </#list>
