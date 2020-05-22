@@ -23,8 +23,8 @@ package io.github.sridharbandi;
 
 import freemarker.template.Template;
 import io.github.sridharbandi.ftl.FtlConfig;
-import io.github.sridharbandi.modal.Issue;
-import io.github.sridharbandi.modal.Issues;
+import io.github.sridharbandi.modal.htmlcs.Issue;
+import io.github.sridharbandi.modal.htmlcs.Issues;
 import io.github.sridharbandi.report.Result;
 import io.github.sridharbandi.util.DateUtil;
 import io.github.sridharbandi.util.SaveJson;

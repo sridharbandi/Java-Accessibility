@@ -21,6 +21,8 @@
  */
 package io.github.sridharbandi.modal;
 
+import io.github.sridharbandi.modal.htmlcs.Issue;
+import io.github.sridharbandi.modal.htmlcs.Issues;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

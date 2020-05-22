@@ -23,7 +23,7 @@ package io.github.sridharbandi.report;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.sridharbandi.modal.Issue;
+import io.github.sridharbandi.modal.htmlcs.Issue;
 import io.github.sridharbandi.modal.axe.AxeIssue;
 import io.github.sridharbandi.modal.axe.AxeIssueList;
 import org.openqa.selenium.WebDriver;

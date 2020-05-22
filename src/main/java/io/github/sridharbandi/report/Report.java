@@ -26,7 +26,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import io.github.sridharbandi.Accessibility;
 import io.github.sridharbandi.driver.DriverContext;
-import io.github.sridharbandi.modal.Issues;
+import io.github.sridharbandi.modal.htmlcs.Issues;
 import io.github.sridharbandi.modal.axe.AxeIssues;
 import io.github.sridharbandi.util.Data;
 import io.github.sridharbandi.util.Runner;

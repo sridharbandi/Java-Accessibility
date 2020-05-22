@@ -22,7 +22,6 @@
 package io.github.sridharbandi.util;
 
 import io.github.sridharbandi.Accessibility;
-import io.github.sridharbandi.modal.Issues;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
